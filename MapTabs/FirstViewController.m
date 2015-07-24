@@ -52,7 +52,7 @@
     [[self labelLongitude] setText:[NSString stringWithFormat:@"%.6f", location.coordinate.longitude]];
     [[self labelAltitude] setText:[NSString stringWithFormat:@"%.2f feet", location.altitude*METERS_FEET]];
     
-    // zoom the map into the users current location
+    // zoom the map into the users current location and fixing the region
     MKCoordinateRegion viewRegion = MKCoordinateRegionMakeWithDistance(location.coordinate, 2*METERS_MILE, 2*METERS_MILE);
     [[self mapView] setRegion:viewRegion animated:YES];
 }

@@ -35,8 +35,6 @@ CLPlacemark *placemark;
     
     [mapView setDelegate:self];
     
-    [[self mapView] setShowsUserLocation:YES];
-    
     manager = [[CLLocationManager alloc] init];
     geocoder = [[CLGeocoder alloc] init];
     
@@ -163,8 +161,8 @@ CLPlacemark *placemark;
     [[self labelAltitude] setText:[NSString stringWithFormat:@"%.2f feet", location.altitude*METERS_FEET]];
     
     // zoom the map into the users current location
-    /*MKCoordinateRegion viewRegion = MKCoordinateRegionMakeWithDistance(location.coordinate, 2*METERS_MILE, 2*METERS_MILE);
-     [[self mapView] setRegion:viewRegion animated:NO];*/
+    //MKCoordinateRegion viewRegion = MKCoordinateRegionMakeWithDistance(location.coordinate, 2*METERS_MILE, 2*METERS_MILE);
+     //[[self mapView] setRegion:viewRegion animated:NO];
 }
 
 - (void)didReceiveMemoryWarning
