@@ -10,8 +10,6 @@
 
 @implementation InsertAnnotation
 
-@synthesize coordinate, title, subtitle;
-
 -(void)dealloc
 {
     

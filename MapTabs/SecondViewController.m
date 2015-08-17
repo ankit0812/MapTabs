@@ -12,9 +12,15 @@
 
 #import "SecondViewController.h"
 #import "InsertAnnotation.h"
+#import "DetailViewController.h"
+
+
 @interface SecondViewController ()
 
 <CLLocationManagerDelegate>
+{
+    UIView *calloutView;
+}
 
 @end
 
@@ -25,7 +31,6 @@
 CLLocationManager *manager;
 CLGeocoder *geocoder;
 CLPlacemark *placemark;
-
 
 -(void)viewDidLoad
 
@@ -53,23 +58,25 @@ CLPlacemark *placemark;
     [[self locationManager] setDesiredAccuracy:kCLLocationAccuracyBest];
     [[self locationManager] startUpdatingLocation];
     
+    [self calculateLoc];
+    [self calculateLoc];
+    
     // Adding the annotations
     
     MKCoordinateRegion bigBen = { {0.0, 0.0} , {0.0, 0.0} };
-    bigBen.center.latitude = 23.3773262;        // Coordinates of my home
-    bigBen.center.longitude =85.319214;
+    bigBen.center.latitude = 23.383271;        // Coordinates of my home
+    bigBen.center.longitude =85.3164882;
     bigBen.span.longitudeDelta = 0.02f;
     bigBen.span.latitudeDelta = 0.02f;
     [mapView setRegion:bigBen animated:YES];
     
     InsertAnnotation *ann1 = [[InsertAnnotation alloc] init];
-    ann1.title = @"My Home";
+    //ann1.title = @"My Home";
     ann1.subtitle = @"Ranchi";
     ann1.coordinate = bigBen.center;
     [mapView addAnnotation: ann1];
     
     /* If we want to add one more annotation we can uncomment this section
-     
      
      MKCoordinateRegion new = { {0.0, 0.0} , {0.0, 0.0} };
      new.center.latitude = 51.50063;
@@ -89,64 +96,97 @@ CLPlacemark *placemark;
 
 // Properties of viewing the annotation i.e. for here the pin
 
--(MKAnnotationView *) mapView:(MKMapView *)mapView viewForAnnotation:(id<MKAnnotation>)annotation
-
-{
-    MKPinAnnotationView *MyPin=[[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"current"];
-    MyPin.pinColor = MKPinAnnotationColorPurple;
+-(MKAnnotationView *) mapView:(MKMapView *)mapView viewForAnnotation:(id<MKAnnotation>)annotation{
     
-    UIButton *advertButton = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
-    [advertButton addTarget:self action:@selector(button:) forControlEvents:UIControlEventTouchUpInside];
+    MKAnnotationView *MyPin=[[MKAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"Current Location"];
     
-    MyPin.rightCalloutAccessoryView = advertButton;
+    
+    // These can be used if we use The MKPinAnnotationView
+    //  MyPin.pinColor = MKPinAnnotationColorPurple;
+    
+    //  UIButton *advertButton = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
+    // [advertButton addTarget:self action:@selector(button:) forControlEvents:UIControlEventTouchUpInside];
+    
+    // MyPin.rightCalloutAccessoryView = advertButton;
+    //  MyPin.animatesDrop=TRUE;
+    MyPin.image=[UIImage imageNamed:@"annot.png"];
     MyPin.draggable = NO;
     MyPin.highlighted = YES;
-    MyPin.animatesDrop=TRUE;
-    MyPin.canShowCallout = YES;
     
+    MyPin.canShowCallout = NO;
     return MyPin;
 }
 
-// Displaying the address
+
+
+- (void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)view{
+    
+    // Using the custom calloutview
+    
+    
+    [self.mapView deselectAnnotation:view.annotation animated:YES];
+   
+    // Allows the selection of annotation again
+    
+    
+    CGSize calloutSize = CGSizeMake(200.0, 80.0);
+    
+    calloutView = [[UIView alloc] initWithFrame:CGRectMake((view.frame.origin.x)/2-10, view.frame.origin.y-calloutSize.height, calloutSize.width, calloutSize.height)];
+    
+    calloutView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.6];
+    
+    UITextField *title=[[UITextField alloc] initWithFrame:CGRectMake(30, 10, 300, 20)];
+    
+    
+    
+    [title setTextColor:[UIColor whiteColor]];
+    
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
+    
+    calloutView.layer.cornerRadius = 5;
+    
+    calloutView.clipsToBounds = YES;
+    
+    button.frame = CGRectMake(80,50,40,20);
+    
+    [button setTitle:@"OK" forState:UIControlStateNormal];
+    
+    [button setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    
+    [title setFont:[UIFont fontWithName:@"Arial-BoldMT" size:16 ]];
+    
+    [button setBackgroundColor:[UIColor blackColor]];
+    
+    [[button layer] setBorderWidth:1.0f];
+    
+    [[button layer] setBorderColor:[UIColor whiteColor].CGColor];
+    
+    
+    title.text=[NSString stringWithFormat:@"%@ %@",_address1,_address2];
+    [title setEnabled:NO];
+    
+    [button addTarget:self action:@selector(button:) forControlEvents:UIControlEventTouchUpInside];
+    
+    
+    // Adding the title and button to the calloutView
+    
+    [calloutView addSubview:title];
+    
+    [calloutView addSubview:button];
+    
+    //Adding Callout the main view
+    
+    [view.superview addSubview:calloutView];
+    
+    
+    
+}
 
 -(void)button:(id)sender
 {
-    
-    CLLocation *ourcoordinate=[[CLLocation alloc] initWithLatitude:23.3773262 longitude:85.319214];
-    
-    //Conversion into address using reverse Geocoding
-    
-    [geocoder reverseGeocodeLocation:ourcoordinate completionHandler:^(NSArray *placemarks, NSError *error) {
-        
-    if (error == nil && [placemarks count] > 0)
-    {
-            
-            placemark = [placemarks lastObject];
-            
-            _address = [NSString stringWithFormat:@"%@\n%@ %@\n%@\n%@",
-                        placemark.thoroughfare,
-                        placemark.postalCode, placemark.locality,
-                        placemark.administrativeArea,
-                        placemark.country];
-        
-            UIAlertView *message = [[UIAlertView alloc] initWithTitle:@"Address"
-                                                              message:_address
-                                                             delegate:nil
-                                                    cancelButtonTitle:@"OK"
-                                                    otherButtonTitles:nil];
-        
-            [message show];
-            
-    }
-    else
-        {
-            
-            NSLog(@"%@", error.debugDescription);
-            
-        }
-        
-    } ];
-    
+    // Performing seque to the DetailView
+
+    [self performSegueWithIdentifier:@"detailView" sender:self];
     
 }
 
@@ -196,4 +236,58 @@ CLPlacemark *placemark;
     }
 }
 
+-(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
+    if ([segue.identifier isEqualToString:@"detailView"])
+    {
+    DetailViewController *detView=segue.destinationViewController;
+        
+        detView.subLocalitytext=_address1;
+        detView.localitytext=_address2;
+        detView.adminAreatext=_address3;
+        detView.countrytext=_address4;
+        detView.pinCodetext=_address5;
+
+    }
+    
+}
+
+
+-(void)calculateLoc
+{
+    
+    CLLocation *ourcoordinate=[[CLLocation alloc] initWithLatitude:23.383271 longitude:85.3164882];
+    
+    //Conversion into address using reverse Geocoding
+    
+    [geocoder reverseGeocodeLocation:ourcoordinate completionHandler:^(NSArray *placemarks, NSError *error) {
+        
+        if (error == nil && [placemarks count] > 0){
+            
+            placemark = [placemarks lastObject];
+            
+            _address1=placemark.subLocality;
+            _address2=placemark.locality;
+            _address3=placemark.administrativeArea;
+            _address4=placemark.country;
+            _address5=placemark.postalCode;
+            
+            _address = [NSString stringWithFormat:@"%@\t %@\t %@\t %@\t %@",
+                        _address1,
+                        _address2,
+                        _address3,
+                        _address4,
+                        _address5];
+        } else{
+            
+            NSLog(@"%@", error.debugDescription);
+            
+        }
+        
+    } ];
+}
+// Dismiss the callout on drag on MapView
+-(void)mapView:(MKMapView *)mapView regionWillChangeAnimated:(BOOL)animated
+{
+    [calloutView removeFromSuperview];
+}
 @end

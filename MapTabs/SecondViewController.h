@@ -14,6 +14,7 @@
 @interface SecondViewController : UIViewController<MKMapViewDelegate>
 
 @property (nonatomic, strong) CLLocationManager *locationManager;
+
 @property (nonatomic,strong) CLLocation *location;
 
 @property (weak, nonatomic) IBOutlet MKMapView *mapView;
@@ -25,6 +26,11 @@
 @property (weak, nonatomic) IBOutlet UILabel *labelAltitude;
 
 @property(nonatomic,strong) NSString *address;
+@property(nonatomic,strong) NSString *address1;
+@property(nonatomic,strong) NSString *address2;
+@property(nonatomic,strong) NSString *address3;
+@property(nonatomic,strong) NSString *address4;
+@property(nonatomic,strong) NSString *address5;
 
 
 - (IBAction)setMap:(id)sender;

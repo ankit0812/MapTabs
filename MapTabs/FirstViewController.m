@@ -18,9 +18,8 @@
 
 @implementation FirstViewController
 
--(void)viewDidLoad
-
-{
+-(void)viewDidLoad{
+    
     [super viewDidLoad];
     
     [[self mapView] setShowsUserLocation:YES];
@@ -44,9 +43,8 @@
 
 // Updating and zooming on the location
 
--(void) locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
-
-{
+-(void) locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations{
+    
     CLLocation *location = locations.lastObject;
     [[self labelLatitude] setText:[NSString stringWithFormat:@"%.6f", location.coordinate.latitude]];
     [[self labelLongitude] setText:[NSString stringWithFormat:@"%.6f", location.coordinate.longitude]];
@@ -55,18 +53,18 @@
     // zoom the map into the users current location and fixing the region
     MKCoordinateRegion viewRegion = MKCoordinateRegionMakeWithDistance(location.coordinate, 2*METERS_MILE, 2*METERS_MILE);
     [[self mapView] setRegion:viewRegion animated:YES];
+    
 }
 
-- (void)didReceiveMemoryWarning
-{
+- (void)didReceiveMemoryWarning{
+    
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
     
 }
 
 //For segmented options for different modes
--(IBAction)setMap:(id)sender
-{
+-(IBAction)setMap:(id)sender{
     
     switch (((UISegmentedControl *)sender).selectedSegmentIndex)
     {
@@ -86,6 +84,7 @@
         default:
             break;
     }
+    
 }
 
 @end
